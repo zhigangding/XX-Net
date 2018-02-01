@@ -124,7 +124,7 @@ class Front(object):
                     self.recent_sent -= sent
                     self.recent_received -= received
 
-            time.sleep(0.01)
+            time.sleep(1)
 
     def worker_num(self):
         host = self.last_host
@@ -136,7 +136,7 @@ class Front(object):
 
     def get_score(self, host=None):
         now = time.time()
-        if now - self.last_fail_time < 5*60 and \
+        if now - self.last_fail_time < 60 and \
                 self.continue_fail_num > 10:
             return None
 
@@ -161,6 +161,10 @@ class Front(object):
 
         dispatcher = self.dispatchs[host]
         response = dispatcher.request(method, host, path, dict(headers), data, timeout=timeout)
+        if not response:
+            xlog.warn("req %s get response timeout", path)
+            return "", 602, {}
+
         status = response.status
         if status not in [200, 405]:
             # xlog.warn("front request %s %s%s fail, status:%d", method, host, path, status)

@@ -11,6 +11,9 @@ import time
 proc_handler = {}
 
 
+xargs = {}
+
+
 current_path = os.path.dirname(os.path.abspath(__file__))
 root_path = os.path.abspath( os.path.join(current_path, os.pardir))
 if root_path not in sys.path:
@@ -24,7 +27,7 @@ def start(module):
     try:
         if module not in config.config["modules"]:
             xlog.error("module not exist %s", module)
-            raise
+            raise Exception()
 
         if module in proc_handler:
             xlog.error("module %s is running", module)
@@ -38,7 +41,7 @@ def start(module):
                 proc_handler[module]["imp"] = __import__(module, globals(), locals(), ['local', 'start'], -1)
 
             _start = proc_handler[module]["imp"].start
-            p = threading.Thread(target=_start.main)
+            p = threading.Thread(target=_start.main, args=([xargs]))
             p.daemon = True
             p.start()
             proc_handler[module]["proc"] = p

@@ -186,7 +186,7 @@
         <h4>{{ _("Help") }}</h4>
         <div class="row-fluid">
             <div class="span4">
-                <label>Socks5</label>
+                <label>SOCKS5</label>
             </div> <!-- .span4 -->
             <div class="span8">
                 <p>127.0.0.1:1080</p>
@@ -278,7 +278,7 @@
 
 <!-- Java Script -->
 <script type="text/javascript">
-    title('X-Tunnel');
+    title('{{ _( "X-Tunnel Configuration" ) }}');
 </script>
 <script type="text/javascript">
     $(function() {
@@ -302,8 +302,8 @@
           // console.log("Normal navigation");
         }
 
-        tip('{{ _("Login ......") }}', 'info', false);
-        $('button[type=submit]', '#login-form').html('{{ _("Please wait...") }}');
+        tip('{{ _("Logining ...") }}', 'info', false);
+        $('button[type=submit]', '#login-form').html('{{ _("Please wait ...") }}');
         $('button[type=submit]', '#login-form').attr('disabled', 'disabled');
         getUserInfo(force_update);
     });
@@ -353,7 +353,7 @@
                 }
 
                 if( result['res'] == 'login_process' ){
-                    tip('{{ _("Login ......") }}', 'info', false);
+                    tip('{{ _("Logining ...") }}', 'info', false);
                     return;
                 }
 
@@ -372,6 +372,8 @@
                 window.refresh_timer.play();
 
                 $('.nav-tabs > li').removeClass('hide');
+
+                $('#register-form').addClass('hide');
                 $('#login-form').addClass('hide');
                 $('#account-information').removeClass('hide');
 
@@ -442,6 +444,29 @@
         var regx = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return regx.test(email);
     }
+
+    function isEmailQualified(email) {
+        if (!isEmailLegal(email)) return false;
+        var host = email.split('@')[1];
+        var weakhosts = ['qq.com', 'sina.cn', 'sina.com', '126.com', '163.com', '163.net', 'yeah.net'];
+        for (var i in weakhosts) {
+            if (host.indexOf(weakhosts[i])>=0) {
+                return false;
+            }
+            /*
+            var regx = /^$/;
+            if (regx.test(host)) {
+                return false;
+            }
+            */
+        }
+        return true;
+    }
+
+    function isPswLegal(password) {
+        var regx = /^[a-zA-Z0-9_~!@#$%^&()+\-*/=.,:;'"<>\?\[\]\{\}]{6,20}$/;
+        return regx.test(password);
+    }
 </script>
 <script type="text/javascript">
     function onLoginSubmit() {
@@ -452,12 +477,12 @@
             tip('{{ _("Email seems invalid." )}}', 'error', false);
             return;
         } else if ( password.length < 6 ) {
-            tip('{{ _("Password needs at least 6 charactors.") }}', 'error', false);
+            tip('{{ _("Password needs at least 6 charactors, and no more than 20.") }}', 'error', false);
             return;
         }
 
-        tip('{{ _("Login ......") }}', 'info', false);
-        $('button[type=submit]', '#login-form').html('{{ _("Please wait...") }}');
+        tip('{{ _("Logining ...") }}', 'info', false);
+        $('button[type=submit]', '#login-form').html('{{ _("Please wait ...") }}');
         $('button[type=submit]', '#login-form').attr('disabled', 'disabled');
         return doLoginAction(username, password);
     }
@@ -504,12 +529,18 @@
         if ( !isEmailLegal(username) ) {
             tip('{{ _("Email seems invalid." )}}', 'error', false);
             return;
-        } else if ( password.length < 6 ) {
-            tip('{{ _("Password needs at least 6 charactors.") }}', 'error', false);
+        } else if ( !isEmailQualified(username) ) {
+            tip('{{ _("Do NOT use Chinese-service-provider\'s Email!") }}', 'error', false);
+            return;
+        } else if ( password.length < 6 || password.length > 20) {
+            tip('{{ _("Password needs at least 6 charactors, and no more than 20.") }}', 'error', false);
+            return;
+        } else if ( !isPswLegal(password) ) {
+            tip('{{ _("Password seems invalid.") }}{{ _("(available:a-zA-Z0-9_~!@#$%^&()+-*/=.,:;\'\"<>\?[]{})") }}', 'error', false);
             return;
         }
 
-        $('button[type=submit]', '#register-form').html('{{ _("Please wait...") }}');
+        $('button[type=submit]', '#register-form').html('{{ _("Please wait ...") }}');
         $('button[type=submit]', '#register-form').attr('disabled', 'disabled');
         return doRegisterAction(username, password);
     }
@@ -529,6 +560,10 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['res'] == 'success' ) {
+                    // register success, hide '#register-form' and login.
+                    // $('#register-form').addClass('hide');
+                    tip('{{ _("Registered successfully, ") }}{{ _("Logining ...") }}', 'info', false);
+
                     return doLoginAction(username, password);
                 } else {
                     if ( result['reason'] == 'user exist' ) {
@@ -574,7 +609,7 @@
 <script type="text/javascript">
     $('.btn-primary', '#charge-modal').click(function() {
         $(this).attr('disabled', 'disabled');
-        $(this).html('{{ _("Please refresh page") }}');
+        $(this).html('{{ _("Please refresh page.") }}');
 
         $('#charge-modal').submit();
     });
@@ -597,7 +632,7 @@
         }
 
         $('.btn-primary', '#transfer-credit-modal').attr('disabled', 'disabled');
-        $('.btn-primary', '#transfer-credit-modal').html('{{ _("Please wait...") }}');
+        $('.btn-primary', '#transfer-credit-modal').html('{{ _("Please wait ...") }}');
         return doTransferCreditAction(transferAccount, transferAmount);
     });
 </script>
@@ -652,7 +687,7 @@
         }
 
         $('.btn-primary', '#transfer-bandwidth-modal').attr('disabled', 'disabled');
-        $('.btn-primary', '#transfer-bandwidth-modal').html('{{ _("Please wait...") }}');
+        $('.btn-primary', '#transfer-bandwidth-modal').html('{{ _("Please wait ...") }}');
         return doTransferBandwidthAction(transferAccount, transferAmount, expireTime);
     });
 </script>
@@ -771,7 +806,7 @@
         getHistory();
 
         $('#get-history-button').attr('disabled', 'disabled');
-        $('#get-history-button').html('Please wait...');
+        $('#get-history-button').html('{{ _("Please wait ...") }}');
     });
 </script>
 <script type="text/javascript">
@@ -789,7 +824,7 @@
             dataType: 'JSON',
             success: function(result) {
                 if( result['res'] != 'success' ){
-                    tip('Get Fail:' + result['reason'], 'warning', false);
+                    tip('{{ _("Get Fail:") }}' + result['reason'], 'warning', false);
                 } else {
                     tipClose();
                 }

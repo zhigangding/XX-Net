@@ -1,12 +1,13 @@
 <form id="config_proxy" method="POST" onSubmit="onSubmit(); return false;">
         <div class="row-fluid">
             <div class="span4">
-                <label for="enable-proxy">{{ _( "LAN proxy(Generally not needed)" ) }} <a href="https://github.com/XX-net/XX-Net/wiki/GoAgent-Intranet-proxy" target="_blank">({{ _( "Help" ) }})</a></label>
+                <label for="enable-proxy">{{ _( "LAN proxy" ) }} <a href="https://github.com/XX-net/XX-Net/wiki/GoAgent-Intranet-proxy" target="_blank">({{ _( "Help" ) }})</a></label>
             </div> <!-- .span4 -->
             <div class="span8">
                 <input id="enable-proxy" type="checkbox" data-toggle="switch" />
             </div> <!-- .span8 -->
         </div> <!-- .row-fluid -->
+        <p class="tip">* {{ _( "Generally not needed, only those who need internal proxy to access the external network (companies, Intranet, campus, etc.) need to configure this." ) }}</p>
         <div id="proxy-options" style="display: none;">
             <div class="row-fluid">
                 <div class="span4">
@@ -111,8 +112,9 @@
     function onSubmit() {
         var enable = $('#enable-proxy').is(':checked') ? 1 : 0;
         var host = $('#proxy-host').val();
+        var port = $('#proxy-port').val();
         if (enable){
-            if ( host == "127.0.0.1" || host == "localhost"){
+            if ( (host == "127.0.0.1" || host == "localhost") && (port == 8086 || port == 8087 || port == 1080)){
                 tip('{{ _( "Do you really need LAN proxy? <a href="https://github.com/XX-net/XX-Net/wiki/LAN-proxy-setting">Help</a>." ) }}', 'error');
                 return;
             }
@@ -123,12 +125,12 @@
             'enable': enable,
             'type': $('#proxy-type').val(),
             'host': host,
-            'port': $('#proxy-port').val(),
+            'port': port,
             'user': $('#proxy-username').val(),
             'passwd': $('#proxy-password').val()
         };
 
-        tip('{{ _( "Wait for checking setting..." ) }}', 'info');
+        tip('{{ _( "Checking settings ..." ) }}', 'info');
 
         $.ajax({
             type: 'GET',
@@ -137,13 +139,13 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['res'] == 'success' ) {
-                    tip('{{ _( "Settings saved successfully" ) }}', 'success');
+                    tip('{{ _( "Settings saved successfully." ) }}', 'success');
                 } else {
-                    tip('{{ _( "Failed saving settings" ) }}' + ":  " + result['reason'], 'error');
+                    tip('{{ _( "Failed saving settings." ) }}' + ":  " + result['reason'], 'error');
                 }
             },
             error: function(){
-                tip('{{ _( "Failed saving settings" ) }}' + ".", 'error');
+                tip('{{ _( "Failed saving settings." ) }}' + ".", 'error');
             }
         });
     }

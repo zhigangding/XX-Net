@@ -18,6 +18,12 @@ except:
     pass
 
 try:
+    import tracemalloc
+    tracemalloc.start(10)
+except:
+    pass
+
+try:
     raw_input          # python 2
 except NameError:
     raw_input = input  # python 3
@@ -66,8 +72,8 @@ sys.excepthook = uncaughtExceptionHandler
 
 has_desktop = True
 
-if "arm" in platform.machine():
-    xlog.info("This is Android or IOS.")
+if "arm" in platform.machine() or "mips" in platform.machine() or "aarch64" in platform.machine():
+    xlog.info("This is Android or IOS or router.")
     has_desktop = False
 
     # check remove linux lib
@@ -77,6 +83,7 @@ if "arm" in platform.machine():
     shutil.rmtree(linux_lib, ignore_errors=True)
     from non_tray import sys_tray
 
+    platform_lib = ""
 elif sys.platform.startswith("linux"):
     def X_is_running():
         try:
@@ -195,17 +202,26 @@ def main():
         config.set(["modules", "launcher", "last_run_version"], current_version)
         config.save()
 
-    module_init.start_all_auto()
+    allow_remote = 0
+    if len(sys.argv) > 1:
+        for s in sys.argv[1:]:
+            xlog.info("command args:%s", s)
+            if s == "-allow_remote":
+                allow_remote = 1
+                module_init.xargs["allow_remote"] = 1
 
-    web_control.start()
+    module_init.start_all_auto()
+    web_control.start(allow_remote)
 
     if has_desktop and config.get(["modules", "launcher", "popup_webui"], 1) == 1:
         host_port = config.get(["modules", "launcher", "control_port"], 8085)
         import webbrowser
-        webbrowser.open("http://127.0.0.1:%s/" % host_port)
+        webbrowser.open("http://localhost:%s/" % host_port)
 
     update.start()
 
+    update_from_github.delete_to_save_disk()
+    
     if config.get(["modules", "launcher", "show_systray"], 1):
         sys_tray.serve_forever()
     else:

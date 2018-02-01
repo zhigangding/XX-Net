@@ -1,7 +1,7 @@
 
 <ul class="nav nav-tabs">
     <li class="active"><a class="config_tab" id="general" data-toggle="tab">{{ _( "General Settings" ) }}</a></li>
-    <li><a class="config_tab" id="update" data-toggle="tab">{{ _( "System Update" ) }}</a></li>
+    <li><a class="config_tab" id="update" data-toggle="tab">{{ _( "System Version" ) }}</a></li>
     <li><a class="config_tab" id="proxy" data-toggle="tab">{{ _( "Proxy Setting" ) }}</a></li>
 </ul>
 
@@ -13,7 +13,7 @@
 
 <!-- JavaScript -->
 <script type="text/javascript">
-    title('{{ _( "System configuration options" ) }}');
+    title('{{ _( "System Configuration" ) }}');
 </script>
 
 <script type="text/javascript">
@@ -36,7 +36,7 @@
         if ( serviceNameSlug == 'gae_proxy_enable' ) {
             serviceName     = '{{ _( "GAE Proxy" ) }}';
         } else if ( serviceNameSlug == 'x_tunnel_enable' ) {
-            serviceName     = '{{ _( "X_tunnel proxy" ) }}';
+            serviceName     = '{{ _( "X-Tunnel" ) }}';
         } else if ( serviceNameSlug == 'smart_router_enable' ) {
             serviceName     = '{{ _( "Smart Router" ) }}';
         } else {
@@ -65,7 +65,7 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['res'] == 'success' ) {
-                    if ( key == 'gae_proxy_enable' || key == 'x_tunnel_enable') {
+                    if ( key == 'gae_proxy_enable' || key == 'x_tunnel_enable' || key == 'smart_router_enable') {
                         restartingService(key);
                     } else {
                         tip('{{ _( "Settings saved successfully." ) }}', 'success');

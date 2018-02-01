@@ -330,7 +330,7 @@ def request_gae_proxy(method, url, headers, body, timeout=60, retry=True):
     accept_encoding = headers.get("Accept-Encoding", "")
     if "br" in accept_encoding:
         accept_br_encoding = True
-        xlog.debug("accept_br_encoding for %s", url)
+        # xlog.debug("accept_br_encoding for %s", url)
     else:
         accept_br_encoding = False
 
@@ -341,8 +341,9 @@ def request_gae_proxy(method, url, headers, body, timeout=60, retry=True):
 
     accept_codes = accept_encoding.replace(" ", "").split(",")
     if not accept_br_encoding:
-        if "gzip" in accept_encoding and host in config.br_sites:
-            accept_codes.remove("gzip")
+        if "gzip" in accept_encoding:
+            if host in config.br_sites or host.endswith(config.br_endswith):
+                accept_codes.remove("gzip")
 
     if "br" not in accept_codes:
         accept_codes.append("br")
@@ -519,7 +520,7 @@ def handler(method, url, headers, body, wfile):
     content_length = int(response.headers.get('Content-Length', 0))
     content_range = response.headers.get('Content-Range', '')
     # content_range 分片时合并用到
-    if content_range:
+    if content_range and 'bytes */' not in content_range:
         start, end, length = tuple(int(x) for x in re.search(
             r'bytes (\d+)-(\d+)/(\d+)', content_range).group(1, 2, 3))
     else:
